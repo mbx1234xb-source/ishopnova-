@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iShop Nova</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{
+  --bg:#0B0F19; --bg2:#151A2D; --blue:#4F7CFF; --violet:#7B5CFF;
+  --text-dim:rgba(255,255,255,.65); --text-dimmer:rgba(255,255,255,.4);
+  --border:rgba(255,255,255,.08); --glass:rgba(255,255,255,.04);
+  --radius:18px; --grad:linear-gradient(135deg,var(--blue),var(--violet));
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:#fff;overflow-x:hidden;direction:rtl;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;border:none;}
+input,select,textarea{font-family:inherit;}
+.container{max-width:1280px;margin:0 auto;padding:0 20px;}
+::-webkit-scrollbar{width:8px;} ::-webkit-scrollbar-thumb{background:var(--grad);border-radius:10px;}
+
+#loader{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity .5s,visibility .5s;}
+#loader.hide{opacity:0;visibility:hidden;}
+.loader-logo{font-size:24px;font-weight:800;background:var(--grad);-webkit-background-clip:text;color:transparent;display:flex;flex-direction:column;align-items:center;gap:14px;}
+.loader-bar{width:130px;height:3px;background:var(--border);border-radius:10px;overflow:hidden;}
+.loader-bar span{display:block;height:100%;width:40%;background:var(--grad);animation:load 1s ease-in-out infinite;}
+@keyframes load{0%{transform:translateX(-150%);}100%{transform:translateX(350%);}}
+
+header{position:fixed;top:10px;left:0;right:0;z-index:1000;display:flex;justify-content:center;}
+.navbar{width:calc(100% - 20px);max-width:1280px;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-radius:100px;background:rgba(21,26,45,.7);backdrop-filter:blur(20px);border:1px solid var(--border);}
+.logo{font-weight:800;font-size:17px;display:flex;align-items:center;gap:8px;}
+.logo img{height:30px;width:auto;border-radius:8px;}
+.logo i{color:var(--blue);}
+.nav-links{display:flex;gap:22px;}
+.nav-links a{font-size:13px;color:var(--text-dim);}
+.nav-links a:hover{color:#fff;}
+.nav-actions{display:flex;gap:8px;align-items:center;}
+.icon-btn{position:relative;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--text-dim);transition:.3s;flex-shrink:0;}
+.icon-btn:hover{background:var(--glass);color:#fff;}
+.icon-btn .badge{position:absolute;top:-2px;left:-2px;background:var(--grad);font-size:9px;font-weight:700;width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+@media(min-width:769px){.burger{display:none;}}
+
+/* Mobile menu */
+.mobile-menu{position:fixed;top:0;right:-100%;width:80%;max-width:320px;height:100vh;background:var(--bg2);z-index:1300;padding:90px 26px 30px;transition:right .5s var(--ease);border-left:1px solid var(--border);overflow-y:auto;}
+.mobile-menu.open{right:0;}
+.mobile-menu a{display:block;padding:15px 0;font-size:16px;font-weight:600;border-bottom:1px solid var(--border);}
+.menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:1250;opacity:0;visibility:hidden;transition:all .4s;}
+.menu-overlay.show{opacity:1;visibility:visible;}
+.close-menu{position:absolute;top:26px;left:26px;font-size:22px;}
+
+/* Hero / Banner Slider */
+.hero-slider{position:relative;margin-top:70px;border-radius:var(--radius);overflow:hidden;height:200px;}
+.hero-slider .slide{position:absolute;inset:0;opacity:0;transition:opacity .8s ease;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;}
+.hero-slider .slide.active{opacity:1;}
+.hero-slider .slide-default{background:linear-gradient(120deg,#131a33,#1d1440);}
+.hero-slider h2{font-size:clamp(18px,4vw,28px);font-weight:800;}
+.hero-slider p{font-size:12px;color:var(--text-dim);margin-top:6px;}
+.slider-dots{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:3;}
+.slider-dots span{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);}
+.slider-dots span.active{background:var(--blue);width:18px;border-radius:4px;}
+
+section{padding:56px 0;}
+.section-head{text-align:center;max-width:600px;margin:0 auto 32px;}
+.section-tag{color:var(--blue);font-weight:600;font-size:11px;letter-spacing:1px;}
+.section-head h2{font-size:clamp(22px,4vw,32px);font-weight:800;margin:8px 0;}
+.section-head p{color:var(--text-dim);font-size:13px;}
+
+/* Brands row */
+.brand-row{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;}
+.brand-chip{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 20px;background:var(--glass);border:1px solid var(--border);border-radius:16px;min-width:90px;transition:.3s;}
+.brand-chip.active{border-color:var(--blue);background:rgba(79,124,255,.1);}
+.brand-chip img{width:32px;height:32px;object-fit:contain;border-radius:6px;}
+.brand-chip .fallback-icon{width:32px;height:32px;border-radius:8px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;}
+.brand-chip span{font-size:11px;color:var(--text-dim);white-space:nowrap;}
+
+.filters{display:flex;gap:8px;justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;margin-bottom:28px;padding-bottom:4px;}
+.filter-btn{flex-shrink:0;padding:8px 18px;border-radius:100px;background:var(--glass);border:1px solid var(--border);color:var(--text-dim);font-size:12px;transition:.3s;}
+.filter-btn.active{background:var(--grad);color:#fff;border-color:transparent;}
+
+.product-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;}
+.product-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:.4s var(--ease);}
+.product-card.hidden{display:none;}
+.product-card:hover{transform:translateY(-5px);box-shadow:0 20px 40px rgba(0,0,0,.4);}
+.product-media{position:relative;aspect-ratio:1/1;overflow:hidden;background:var(--glass);cursor:pointer;}
+.product-media img{width:100%;height:100%;object-fit:cover;}
+.badge-sale{position:absolute;top:10px;right:10px;background:var(--grad);font-size:10px;font-weight:700;padding:5px 10px;border-radius:100px;z-index:2;}
+.badge-warranty{position:absolute;top:10px;left:10px;background:rgba(255,184,79,.15);color:#ffb84f;font-size:9px;font-weight:700;padding:4px 9px;border-radius:100px;z-index:2;border:1px solid rgba(255,184,79,.3);}
+.img-count{position:absolute;bottom:10px;left:10px;background:rgba(11,15,25,.7);font-size:9px;padding:3px 8px;border-radius:100px;z-index:2;}
+.product-info{padding:14px;}
+.product-brand{font-size:10px;color:var(--blue);text-transform:uppercase;font-weight:600;}
+.product-info h3{font-size:13px;font-weight:700;margin:6px 0;line-height:1.5;}
+.stars{color:#ffb84f;font-size:11px;margin-bottom:8px;}
+.price-row{display:flex;gap:6px;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
+.price{font-size:14px;font-weight:800;}
+.old-price{font-size:11px;color:var(--text-dimmer);text-decoration:line-through;}
+.action-row{display:flex;gap:8px;}
+.add-cart{flex:1;padding:10px;border-radius:10px;background:var(--glass);border:1px solid var(--border);color:#fff;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;transition:.3s;}
+.add-cart:hover{background:var(--grad);border-color:transparent;}
+.add-cart.added{background:#22c55e;border-color:transparent;}
+.wish-btn{width:38px;height:38px;flex-shrink:0;border-radius:10px;background:var(--glass);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;transition:.3s;}
+.wish-btn.active{color:#ff4f7c;border-color:#ff4f7c;}
+
+.empty-state{text-align:center;color:var(--text-dimmer);padding:50px 20px;grid-column:1/-1;font-size:13px;}
+
+/* Modals general */
+.overlay-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:1400;opacity:0;visibility:hidden;transition:all .4s;}
+.overlay-bg.show{opacity:1;visibility:visible;}
+.gallery-modal{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2000;display:none;align-items:center;justify-content:center;flex-direction:column;padding:20px;}
+.gallery-modal.show{display:flex;}
+.gallery-modal img{max-width:100%;max-height:58vh;border-radius:16px;object-fit:contain;}
+.gallery-thumbs{display:flex;gap:8px;margin-top:14px;overflow-x:auto;max-width:100%;}
+.gallery-thumbs img{width:50px;height:50px;border-radius:8px;object-fit:cover;opacity:.5;border:2px solid transparent;}
+.gallery-thumbs img.active{opacity:1;border-color:var(--blue);}
+.gallery-close{position:absolute;top:22px;left:22px;font-size:22px;color:#fff;}
+
+.drawer{position:fixed;top:0;left:-100%;width:88%;max-width:400px;height:100vh;background:var(--bg2);z-index:1500;transition:left .5s var(--ease);display:flex;flex-direction:column;border-right:1px solid var(--border);}
+.drawer.open{left:0;}
+.drawer-head{display:flex;justify-content:space-between;align-items:center;padding:20px;border-bottom:1px solid var(--border);}
+.drawer-head h3{font-size:16px;font-weight:700;}
+.drawer-body{flex:1;overflow-y:auto;padding:14px 20px;}
+.cart-item{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);align-items:center;}
+.cart-item img{width:54px;height:54px;border-radius:8px;object-fit:cover;flex-shrink:0;}
+.cart-item .info{flex:1;min-width:0;}
+.cart-item h4{font-size:12px;margin-bottom:3px;}
+.price-sm{font-size:12px;color:var(--blue);font-weight:700;}
+.qty-control{display:flex;align-items:center;gap:6px;margin-top:5px;}
+.qty-control button{width:22px;height:22px;border-radius:6px;background:var(--glass);border:1px solid var(--border);color:#fff;font-size:11px;}
+.remove-item{color:#ff4f7c;font-size:13px;margin-right:auto;}
+.drawer-footer{padding:16px 20px;border-top:1px solid var(--border);}
+.total-row{display:flex;justify-content:space-between;margin-bottom:14px;font-weight:700;font-size:14px;}
+.checkout-btn{width:100%;padding:14px;border-radius:12px;background:var(--grad);color:#fff;font-weight:700;font-size:13px;}
+
+/* Auth / Checkout modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:1800;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal.show{display:flex;}
+.modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px 24px;width:100%;max-width:380px;max-height:88vh;overflow-y:auto;}
+.modal-box h3{font-size:17px;font-weight:700;margin-bottom:6px;}
+.modal-box p.sub{font-size:12px;color:var(--text-dimmer);margin-bottom:20px;}
+.field{margin-bottom:14px;}
+.field label{font-size:12px;color:var(--text-dim);display:block;margin-bottom:6px;}
+.field input,.field textarea{width:100%;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;}
+.field input:focus,.field textarea:focus{border-color:var(--blue);}
+.otp-boxes{display:flex;gap:8px;justify-content:center;margin:16px 0;}
+.otp-boxes input{width:44px;height:52px;text-align:center;font-size:20px;background:var(--glass);border:1px solid var(--border);border-radius:10px;color:#fff;}
+.modal-close{position:absolute;top:16px;left:16px;font-size:18px;color:var(--text-dim);}
+.modal-box{position:relative;}
+.demo-note{background:rgba(255,184,79,.1);border:1px solid rgba(255,184,79,.25);color:#ffb84f;font-size:11px;padding:10px 12px;border-radius:10px;margin-bottom:14px;text-align:center;}
+.link-btn{color:var(--blue);font-size:12px;text-align:center;display:block;margin-top:14px;}
+.pay-icon{width:70px;height:70px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 18px;}
+.order-num{background:var(--glass);border:1px dashed var(--border);border-radius:10px;padding:12px;text-align:center;font-weight:700;margin:14px 0;}
+
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:50px 0 24px;}
+.footer-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:32px;margin-bottom:40px;}
+.footer-brand p{color:var(--text-dimmer);font-size:12px;margin:12px 0 18px;line-height:1.9;}
+.social-row{display:flex;gap:8px;flex-wrap:wrap;}
+.social-row a{width:34px;height:34px;border-radius:50%;background:var(--glass);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;transition:.3s;font-size:13px;}
+.social-row a:hover{background:var(--grad);}
+.footer-col h4{font-size:13px;font-weight:700;margin-bottom:16px;}
+.footer-col p,.footer-col a{display:block;color:var(--text-dimmer);font-size:12px;margin-bottom:11px;line-height:1.8;}
+.trust-badge{width:52px;height:52px;background:var(--glass);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:8px;text-align:center;color:var(--text-dimmer);}
+.footer-bottom{border-top:1px solid var(--border);padding-top:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.footer-bottom p{color:var(--text-dimmer);font-size:11px;}
+.admin-link{color:var(--blue);font-size:11px;}
+
+@media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){.footer-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div id="loader"><div class="loader-logo">iShop Nova<div class="loader-bar"><span></span></div></div></div>
+
+<header>
+  <nav class="navbar">
+    <div class="logo" id="navLogo"><i class="fa-solid fa-bolt"></i>iShop Nova</div>
+    <div class="nav-links" style="display:none;" id="deskLinks">
+      <a href="#home">خانه</a><a href="#products">محصولات</a><a href="#brands-section">برندها</a><a href="#contact">تماس</a>
+    </div>
+    <div class="nav-actions">
+      <button class="icon-btn" id="authBtn"><i class="fa-solid fa-user"></i></button>
+      <button class="icon-btn" id="wishBtn"><i class="fa-solid fa-heart"></i><span class="badge" id="wishCount">0</span></button>
+      <button class="icon-btn" id="cartBtn"><i class="fa-solid fa-bag-shopping"></i><span class="badge" id="cartCount">0</span></button>
+      <button class="icon-btn" id="burgerBtn"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </nav>
+</header>
+
+<div class="menu-overlay" id="menuOverlay"></div>
+<div class="mobile-menu" id="mobileMenu">
+  <button class="icon-btn close-menu" id="closeMenu"><i class="fa-solid fa-xmark"></i></button>
+  <a href="#home">خانه</a><a href="#products">محصولات</a><a href="#brands-section">برندها</a><a href="#contact">تماس</a>
+</div>
+
+<div class="container">
+  <div class="hero-slider" id="heroSlider"></div>
+</div>
+
+<section id="brands-section">
+  <div class="container">
+    <div class="section-head"><span class="section-tag">نمایندگی</span><h2>برندهای معتبر</h2><p>نمایندگی رسمی فستر و گرین لاین</p></div>
+    <div class="brand-row" id="brandRow"></div>
+  </div>
+</section>
+
+<section id="products">
+  <div class="container">
+    <div class="section-head"><span class="section-tag">فروشگاه</span><h2>محصولات ما</h2><p>اورجینال، با ضمانت اصالت کالا</p></div>
+    <div class="filters" id="filters"></div>
+    <div class="product-grid" id="productGrid"></div>
+  </div>
+</section>
+
+<!-- Gallery -->
+<div class="gallery-modal" id="galleryModal">
+  <button class="gallery-close" id="galleryClose"><i class="fa-solid fa-xmark"></i></button>
+  <img id="galleryMain" src="" alt="">
+  <div class="gallery-thumbs" id="galleryThumbs"></div>
+</div>
+
+<!-- Cart -->
+<div class="overlay-bg" id="overlayBg"></div>
+<div class="drawer" id="cartDrawer">
+  <div class="drawer-head"><h3><i class="fa-solid fa-bag-shopping"></i> سبد خرید</h3><button class="icon-btn" id="closeCart"><i class="fa-solid fa-xmark"></i></button></div>
+  <div class="drawer-body" id="cartBody"></div>
+  <div class="drawer-footer">
+    <div class="total-row"><span>مجموع:</span><span id="cartTotal">۰ تومان</span></div>
+    <button class="checkout-btn" id="goCheckout"><i class="fa-solid fa-arrow-left"></i> ادامه فرآیند خرید</button>
+  </div>
+</div>
+
+<!-- Wishlist -->
+<div class="drawer" id="wishDrawer">
+  <div class="drawer-head"><h3><i class="fa-solid fa-heart"></i> علاقه‌مندی‌ها</h3><button class="icon-btn" id="closeWish"><i class="fa-solid fa-xmark"></i></button></div>
+  <div class="drawer-body" id="wishBody"></div>
+</div>
+
+<!-- Auth Modal -->
+<div class="modal" id="authModal">
+  <div class="modal-box">
+    <button class="modal-close" id="closeAuth"><i class="fa-solid fa-xmark"></i></button>
+    <div id="authStep1">
+      <h3>ورود / ثبت‌نام</h3>
+      <p class="sub">شماره موبایل خود را وارد کنید</p>
+      <div class="field"><input type="tel" id="authPhone" placeholder="۰۹۱۲۳۴۵۶۷۸۹" maxlength="11"></div>
+      <button class="checkout-btn" id="sendOtpBtn">ارسال کد تایید</button>
+    </div>
+    <div id="authStep2" style="display:none;">
+      <h3>کد تایید</h3>
+      <p class="sub">کد ۴ رقمی ارسال‌شده را وارد کنید</p>
+      <div class="demo-note" id="demoOtpNote"></div>
+      <div class="otp-boxes">
+        <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
+      </div>
+      <button class="checkout-btn" id="verifyOtpBtn">تایید و ورود</button>
+    </div>
+    <div id="authStep3" style="display:none;text-align:center;">
+      <div class="pay-icon"><i class="fa-solid fa-check"></i></div>
+      <h3 style="text-align:center;">خوش آمدید!</h3>
+      <p class="sub" style="text-align:center;" id="welcomeMsg"></p>
+      <button class="checkout-btn" id="logoutBtn">خروج از حساب</button>
+    </div>
+  </div>
+</div>
+
+<!-- Checkout Modal -->
+<div class="modal" id="checkoutModal">
+  <div class="modal-box">
+    <button class="modal-close" id="closeCheckout"><i class="fa-solid fa-xmark"></i></button>
+    <div id="checkoutStep1">
+      <h3>اطلاعات سفارش</h3>
+      <p class="sub">اطلاعات تحویل سفارش را وارد کنید</p>
+      <div class="field"><label>نام و نام خانوادگی</label><input type="text" id="custName"></div>
+      <div class="field"><label>شماره موبایل</label><input type="tel" id="custPhone" maxlength="11"></div>
+      <div class="field"><label>آدرس کامل</label><textarea id="custAddress" rows="3"></textarea></div>
+      <button class="checkout-btn" id="goPayment">ادامه به درگاه پرداخت</button>
+    </div>
+    <div id="checkoutStep2" style="display:none;text-align:center;">
+      <div class="pay-icon"><i class="fa-solid fa-lock"></i></div>
+      <h3 style="text-align:center;">درگاه پرداخت امن</h3>
+      <p class="sub" style="text-align:center;">این بخش به‌زودی به درگاه پرداخت واقعی وصل می‌شود. برای تست، پرداخت را تایید کنید.</p>
+      <div class="total-row" style="justify-content:center;gap:10px;"><span>مبلغ قابل پرداخت:</span><span id="payAmount"></span></div>
+      <button class="checkout-btn" id="confirmPay"><i class="fa-solid fa-circle-check"></i> تایید پرداخت (تستی)</button>
+    </div>
+    <div id="checkoutStep3" style="display:none;text-align:center;">
+      <div class="pay-icon"><i class="fa-solid fa-check"></i></div>
+      <h3 style="text-align:center;">سفارش ثبت شد ✅</h3>
+      <p class="sub" style="text-align:center;">سفارش شما با موفقیت ثبت شد و به‌زودی پردازش می‌شود.</p>
+      <div class="order-num" id="orderNumBox"></div>
+      <button class="checkout-btn" id="closeOrderDone">باشه</button>
+    </div>
+  </div>
+</div>
+
+<footer id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo"><i class="fa-solid fa-bolt"></i>iShop Nova</div>
+        <p>خریدی مطمئن، سریع و آسان، با تنوعی بی‌نظیر — هدف ما، رضایت شماست.</p>
+        <div class="social-row">
+          <a href="http://instagram.com/ishop.irr" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+          <a href="http://wa.me/989001739777" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="https://bale.ai/ishopp_ir" target="_blank"><i class="fa-solid fa-paper-plane"></i></a>
+          <a href="https://rubika.ir/ishopp_ir" target="_blank"><i class="fa-solid fa-comment-dots"></i></a>
+          <a href="https://splus.ir/ishopp_ir" target="_blank"><i class="fa-solid fa-message"></i></a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>دسترسی سریع</h4><a href="#home">خانه</a><a href="#products">محصولات</a><a href="#brands-section">برندها</a></div>
+      <div class="footer-col"><h4>پشتیبانی</h4><p>۲۴ ساعت مهلت تعویض کالا</p><p>۱ سال گارانتی تعویض (فستر و گرین لاین)</p></div>
+      <div class="footer-col">
+        <h4>تماس با ما</h4>
+        <p><i class="fa-solid fa-phone"></i> ۰۹۰۰۱۷۳۹۷۷۷</p>
+        <p><i class="fa-solid fa-location-dot"></i> ایران، خوزستان، خرمشهر، خیابان حافظ نو، نبش قاآنی</p>
+        <div class="trust-badge">نماد اعتماد</div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© ۲۰۲۶ آی‌شاپ نوا. تمامی حقوق محفوظ است.</p>
+      <a href="admin.html" class="admin-link"><i class="fa-solid fa-lock"></i> پنل مدیریت</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const K = { products:'ishopnova_products', cart:'ishopnova_cart', wish:'ishopnova_wishlist', settings:'ishopnova_settings', users:'ishopnova_users', session:'ishopnova_session', orders:'ishopnova_orders' };
+
+const DEFAULT_PRODUCTS = [
+  {id:1,name:"ساعت هوشمند TELZEAL WH-05 Pro Max Screen",brand:"Telzeal",cat:"ساعت هوشمند",price:4700000,old:null,sale:null,rating:5,warranty:"۲۴ ساعت مهلت تعویض",images:["https://picsum.photos/seed/tz1/500/500"]},
+  {id:2,name:"دسته بازی و خنک‌کننده پرودو Chillcore",brand:"Porodo",cat:"لوازم گیمینگ",price:6200000,old:null,sale:null,rating:5,warranty:"۲۴ ساعت مهلت تعویض",images:["https://picsum.photos/seed/pr1/500/500"]},
+  {id:3,name:"ایرپاد فستر Raptor ANC+ENC",brand:"Faster",cat:"هدفون بلوتوثی",price:2590000,old:null,sale:null,rating:5,warranty:"۱ سال گارانتی تعویض",images:["https://picsum.photos/seed/fs1/500/500"]},
+  {id:4,name:"ساعت هوشمند گرین لاین Strive نارنجی",brand:"Green Lion",cat:"ساعت هوشمند",price:3250000,old:null,sale:null,rating:5,warranty:"۱ سال گارانتی تعویض",images:["https://picsum.photos/seed/gl1/500/500"]},
+  {id:5,name:"شارژر دیواری پاورولوژی ۱۴۰ وات",brand:"Powerology",cat:"شارژر و آداپتور",price:9700000,old:null,sale:null,rating:5,warranty:"۲۴ ساعت مهلت تعویض",images:["https://picsum.photos/seed/pw1/500/500"]},
+];
+const DEFAULT_BRANDS = ["Faster","Green Lion","Porodo","Powerology","Telzeal","Porodo Gaming"];
+
+function get(key, fallback){ const v = localStorage.getItem(key); if(v){ try{return JSON.parse(v);}catch(e){} } return fallback; }
+function set(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+
+function getProducts(){ let p = get(K.products,null); if(!p){ set(K.products,DEFAULT_PRODUCTS); p=DEFAULT_PRODUCTS; } return p; }
+function getSettings(){ return get(K.settings, {logo:'', banners:[], brands:DEFAULT_BRANDS.map(n=>({name:n,logo:''}))}); }
+function getCart(){ return get(K.cart, []); }
+function saveCart(c){ set(K.cart,c); updateBadges(); }
+function getWish(){ return get(K.wish, []); }
+function saveWish(w){ set(K.wish,w); updateBadges(); }
+function getUsers(){ return get(K.users, []); }
+function getSession(){ return get(K.session, null); }
+function getOrders(){ return get(K.orders, []); }
+function saveOrders(o){ set(K.orders,o); }
+function fmtPrice(n){ return n.toLocaleString('fa-IR') + ' تومان'; }
+let currentFilterCat = 'همه', currentFilterBrand = null;
+
+// ---------- Logo ----------
+function renderLogo(){
+  const s = getSettings();
+  const nav = document.getElementById('navLogo');
+  nav.innerHTML = s.logo ? `<img src="${s.logo}" alt="logo">iShop Nova` : `<i class="fa-solid fa-bolt"></i>iShop Nova`;
+}
+
+// ---------- Hero Slider ----------
+let sliderIdx = 0, sliderTimer;
+function renderSlider(){
+  const s = getSettings();
+  const el = document.getElementById('heroSlider');
+  if(!s.banners || s.banners.length===0){
+    el.innerHTML = `<div class="slide active slide-default"><div><h2>خریدی مطمئن، سریع و آسان</h2><p>با تنوعی بی‌نظیر — هدف ما، رضایت شماست</p></div></div>`;
+    return;
+  }
+  el.innerHTML = s.banners.map((b,i)=>`<div class="slide ${i===0?'active':''}" style="background-image:url('${b}')"></div>`).join('') +
+    `<div class="slider-dots">${s.banners.map((b,i)=>`<span class="${i===0?'active':''}"></span>`).join('')}</div>`;
+  if(s.banners.length>1){
+    clearInterval(sliderTimer);
+    sliderTimer = setInterval(()=>{
+      const slides = el.querySelectorAll('.slide'); const dots = el.querySelectorAll('.slider-dots span');
+      slides[sliderIdx].classList.remove('active'); dots[sliderIdx].classList.remove('active');
+      sliderIdx = (sliderIdx+1) % slides.length;
+      slides[sliderIdx].classList.add('active'); dots[sliderIdx].classList.add('active');
+    }, 3500);
+  }
+}
+
+// ---------- Brand row ----------
+function renderBrands(){
+  const s = getSettings();
+  const brands = (s.brands && s.brands.length) ? s.brands : DEFAULT_BRANDS.map(n=>({name:n,logo:''}));
+  const row = document.getElementById('brandRow');
+  row.innerHTML = `<div class="brand-chip ${!currentFilterBrand?'active':''}" data-brand=""><div class="fallback-icon"><i class="fa-solid fa-border-all"></i></div><span>همه</span></div>` +
+    brands.map(b=>`<div class="brand-chip ${currentFilterBrand===b.name?'active':''}" data-brand="${b.name}">
+      ${b.logo ? `<img src="${b.logo}" alt="${b.name}">` : `<div class="fallback-icon">${b.name.charAt(0)}</div>`}
+      <span>${b.name}</span>
+    </div>`).join('');
+  row.querySelectorAll('.brand-chip').forEach(chip=>{
+    chip.addEventListener('click',()=>{
+      currentFilterBrand = chip.dataset.brand || null;
+      renderBrands(); renderProducts();
+      document.getElementById('products').scrollIntoView({behavior:'smooth'});
+    });
+  });
+}
+
+function renderStars(r){ let s=''; for(let i=1;i<=5;i++){ s += i<=r ? '★' : '<span style="color:var(--text-dimmer)">★</span>'; } return s; }
+
+function productCard(p){
+  const imgs = p.images && p.images.length ? p.images : ['https://picsum.photos/seed/'+p.id+'/500/500'];
+  return `
+  <div class="product-card" data-cat="${p.cat}" data-brand="${p.brand}">
+    <div class="product-media" data-id="${p.id}">
+      ${p.sale ? `<span class="badge-sale">-${p.sale}%</span>` : ''}
+      ${p.warranty ? `<span class="badge-warranty">${p.warranty}</span>` : ''}
+      ${imgs.length>1 ? `<span class="img-count"><i class="fa-solid fa-images"></i> ${imgs.length}</span>` : ''}
+      <img src="${imgs[0]}" alt="${p.name}" loading="lazy">
+    </div>
+    <div class="product-info">
+      <span class="product-brand">${p.brand || ''}</span>
+      <h3>${p.name}</h3>
+      <div class="stars">${renderStars(p.rating||5)}</div>
+      <div class="price-row"><span class="price">${fmtPrice(p.price)}</span>${p.old ? `<span class="old-price">${fmtPrice(p.old)}</span>` : ''}</div>
+      <div class="action-row">
+        <button class="add-cart" data-id="${p.id}"><i class="fa-solid fa-bag-shopping"></i> افزودن</button>
+        <button class="wish-btn ${getWish().includes(p.id)?'active':''}" data-id="${p.id}"><i class="fa-${getWish().includes(p.id)?'solid':'regular'} fa-heart"></i></button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderProducts(){
+  const products = getProducts();
+  const grid = document.getElementById('productGrid');
+  if(products.length === 0){ grid.innerHTML = `<div class="empty-state">هنوز محصولی اضافه نشده.</div>`; document.getElementById('filters').innerHTML=''; return; }
+  let filtered = products;
+  if(currentFilterBrand) filtered = filtered.filter(p=>p.brand===currentFilterBrand);
+  grid.innerHTML = filtered.length ? filtered.map(productCard).join('') : `<div class="empty-state">محصولی در این دسته پیدا نشد.</div>`;
+
+  const cats = ['همه', ...new Set(products.map(p=>p.cat))];
+  document.getElementById('filters').innerHTML = cats.map(c=>`<button class="filter-btn ${c===currentFilterCat?'active':''}" data-filter="${c}">${c}</button>`).join('');
+  document.querySelectorAll('.filter-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      currentFilterCat = btn.dataset.filter;
+      document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.product-card').forEach(card=>{
+        card.classList.toggle('hidden', currentFilterCat!=='همه' && card.dataset.cat!==currentFilterCat);
+      });
+    });
+  });
+}
+
+// Gallery
+document.addEventListener('click', e=>{
+  const media = e.target.closest('.product-media');
+  if(media){
+    const p = getProducts().find(x=>x.id==media.dataset.id);
+    const imgs = p.images && p.images.length ? p.images : ['https://picsum.photos/seed/'+p.id+'/500/500'];
+    document.getElementById('galleryMain').src = imgs[0];
+    document.getElementById('galleryThumbs').innerHTML = imgs.map((im,i)=>`<img src="${im}" class="${i===0?'active':''}" data-src="${im}">`).join('');
+    document.getElementById('galleryModal').classList.add('show');
+  }
+  const thumb = e.target.closest('.gallery-thumbs img');
+  if(thumb){ document.getElementById('galleryMain').src = thumb.dataset.src; document.querySelectorAll('.gallery-thumbs img').forEach(i=>i.classList.remove('active')); thumb.classList.add('active'); }
+});
+document.getElementById('galleryClose').addEventListener('click',()=>document.getElementById('galleryModal').classList.remove('show'));
+document.getElementById('galleryModal').addEventListener('click', e=>{ if(e.target.id==='galleryModal') e.target.classList.remove('show'); });
+
+// Wishlist & Cart actions
+document.addEventListener('click', e=>{
+  const wb = e.target.closest('.wish-btn');
+  if(wb){ const id = Number(wb.dataset.id); let wish = getWish(); wish = wish.includes(id) ? wish.filter(x=>x!==id) : [...wish,id]; saveWish(wish); renderProducts(); renderWish(); }
+  const ac = e.target.closest('.add-cart');
+  if(ac){ const id = Number(ac.dataset.id); let cart = getCart(); const ex = cart.find(x=>x.id===id); if(ex) ex.qty++; else cart.push({id,qty:1}); saveCart(cart);
+    ac.classList.add('added'); ac.innerHTML='<i class="fa-solid fa-check"></i> اضافه شد'; setTimeout(()=>{ ac.classList.remove('added'); ac.innerHTML='<i class="fa-solid fa-bag-shopping"></i> افزودن'; },1200); }
+});
+
+function updateBadges(){ const cart=getCart(); document.getElementById('cartCount').textContent = cart.reduce((s,i)=>s+i.qty,0); document.getElementById('wishCount').textContent = getWish().length; }
+
+function renderCart(){
+  const cart = getCart(); const products = getProducts(); const body = document.getElementById('cartBody');
+  if(cart.length===0){ body.innerHTML = `<p style="color:var(--text-dimmer);text-align:center;padding:40px 0;">سبد خرید خالی است</p>`; document.getElementById('cartTotal').textContent='۰ تومان'; return; }
+  let total = 0;
+  body.innerHTML = cart.map(item=>{
+    const p = products.find(x=>x.id===item.id); if(!p) return ''; total += p.price*item.qty;
+    const img = (p.images && p.images[0]) || 'https://picsum.photos/seed/'+p.id+'/100/100';
+    return `<div class="cart-item"><img src="${img}"><div class="info"><h4>${p.name}</h4><span class="price-sm">${fmtPrice(p.price)}</span>
+      <div class="qty-control"><button class="qty-minus" data-id="${p.id}">-</button><span>${item.qty}</span><button class="qty-plus" data-id="${p.id}">+</button>
+      <button class="remove-item" data-id="${p.id}"><i class="fa-solid fa-trash"></i></button></div></div></div>`;
+  }).join('');
+  document.getElementById('cartTotal').textContent = fmtPrice(total);
+}
+document.addEventListener('click', e=>{
+  const id = e.target.closest('[data-id]')?.dataset.id; if(!id) return;
+  let cart = getCart(); const item = cart.find(x=>x.id===Number(id));
+  if(e.target.closest('.qty-plus') && item){ item.qty++; saveCart(cart); renderCart(); }
+  if(e.target.closest('.qty-minus') && item){ item.qty--; if(item.qty<=0) cart = cart.filter(x=>x.id!==Number(id)); saveCart(cart); renderCart(); }
+  if(e.target.closest('.remove-item') && !e.target.closest('#wishBody')){ cart = cart.filter(x=>x.id!==Number(id)); saveCart(cart); renderCart(); }
+});
+
+function renderWish(){
+  const wish = getWish(); const products = getProducts(); const body = document.getElementById('wishBody');
+  if(wish.length===0){ body.innerHTML = `<p style="color:var(--text-dimmer);text-align:center;padding:40px 0;">لیست علاقه‌مندی خالی است</p>`; return; }
+  body.innerHTML = wish.map(id=>{
+    const p = products.find(x=>x.id===id); if(!p) return '';
+    const img = (p.images && p.images[0]) || 'https://picsum.photos/seed/'+p.id+'/100/100';
+    return `<div class="cart-item"><img src="${img}"><div class="info"><h4>${p.name}</h4><span class="price-sm">${fmtPrice(p.price)}</span></div><button class="remove-item" data-wid="${p.id}"><i class="fa-solid fa-trash"></i></button></div>`;
+  }).join('');
+}
+document.addEventListener('click', e=>{ const w = e.target.closest('[data-wid]'); if(w){ saveWish(getWish().filter(x=>x!==Number(w.dataset.wid))); renderWish(); renderProducts(); } });
+
+// Drawers & mobile menu
+const overlay = document.getElementById('overlayBg');
+document.getElementById('cartBtn').addEventListener('click',()=>{ renderCart(); document.getElementById('cartDrawer').classList.add('open'); overlay.classList.add('show'); });
+document.getElementById('closeCart').addEventListener('click',()=>{ document.getElementById('cartDrawer').classList.remove('open'); overlay.classList.remove('show'); });
+document.getElementById('wishBtn').addEventListener('click',()=>{ renderWish(); document.getElementById('wishDrawer').classList.add('open'); overlay.classList.add('show'); });
+document.getElementById('closeWish').addEventListener('click',()=>{ document.getElementById('wishDrawer').classList.remove('open'); overlay.classList.remove('show'); });
+overlay.addEventListener('click',()=>{ document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('wishDrawer').classList.remove('open'); overlay.classList.remove('show'); });
+
+const mobileMenu = document.getElementById('mobileMenu'), menuOverlay = document.getElementById('menuOverlay');
+document.getElementById('burgerBtn').addEventListener('click',()=>{ mobileMenu.classList.add('open'); menuOverlay.classList.add('show'); });
+document.getElementById('closeMenu').addEventListener('click',()=>{ mobileMenu.classList.remove('open'); menuOverlay.classList.remove('show'); });
+menuOverlay.addEventListener('click',()=>{ mobileMenu.classList.remove('open'); menuOverlay.classList.remove('show'); });
+mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{ mobileMenu.classList.remove('open'); menuOverlay.classList.remove('show'); }));
+
+// ---------- Auth ----------
+let pendingOtp = null, pendingPhone = null;
+const authModal = document.getElementById('authModal');
+function openAuth(){
+  const session = getSession();
+  document.getElementById('authStep1').style.display='none';
+  document.getElementById('authStep2').style.display='none';
+  document.getElementById('authStep3').style.display='none';
+  if(session){ document.getElementById('authStep3').style.display='block'; document.getElementById('welcomeMsg').textContent = 'شما با شماره ' + session.phone + ' وارد شده‌اید'; }
+  else{ document.getElementById('authStep1').style.display='block'; }
+  authModal.classList.add('show');
+}
+document.getElementById('authBtn').addEventListener('click', openAuth);
+document.getElementById('closeAuth').addEventListener('click',()=>authModal.classList.remove('show'));
+document.getElementById('sendOtpBtn').addEventListener('click',()=>{
+  const phone = document.getElementById('authPhone').value.trim();
+  if(!/^09\d{9}$/.test(phone)){ alert('شماره موبایل معتبر نیست (مثال: 09123456789)'); return; }
+  pendingPhone = phone;
+  pendingOtp = String(Math.floor(1000 + Math.random()*9000));
+  document.getElementById('demoOtpNote').textContent = 'حالت نمایشی: کد تایید شما ' + pendingOtp + ' است (در نسخه واقعی پیامک می‌شود)';
+  document.getElementById('authStep1').style.display='none';
+  document.getElementById('authStep2').style.display='block';
+  document.querySelectorAll('.otp-boxes input').forEach(i=>i.value='');
+  document.querySelectorAll('.otp-boxes input')[0].focus();
+});
+document.querySelectorAll('.otp-boxes input').forEach((inp,idx,arr)=>{
+  inp.addEventListener('input',()=>{ if(inp.value && arr[idx+1]) arr[idx+1].focus(); });
+});
+document.getElementById('verifyOtpBtn').addEventListener('click',()=>{
+  const code = Array.from(document.querySelectorAll('.otp-boxes input')).map(i=>i.value).join('');
+  if(code !== pendingOtp){ alert('کد وارد شده اشتباه است'); return; }
+  let users = getUsers();
+  let user = users.find(u=>u.phone===pendingPhone);
+  if(!user){ user = { phone: pendingPhone, createdAt: new Date().toISOString() }; users.push(user); set(K.users, users); }
+  set(K.session, user);
+  document.getElementById('authStep2').style.display='none';
+  document.getElementById('authStep3').style.display='block';
+  document.getElementById('welcomeMsg').textContent = 'شما با شماره ' + pendingPhone + ' وارد شدید';
+});
+document.getElementById('logoutBtn').addEventListener('click',()=>{ localStorage.removeItem(K.session); authModal.classList.remove('show'); });
+
+// ---------- Checkout ----------
+const checkoutModal = document.getElementById('checkoutModal');
+document.getElementById('goCheckout').addEventListener('click',()=>{
+  if(getCart().length===0){ alert('سبد خرید شما خالی است'); return; }
+  document.getElementById('checkoutStep1').style.display='block';
+  document.getElementById('checkoutStep2').style.display='none';
+  document.getElementById('checkoutStep3').style.display='none';
+  const session = getSession();
+  if(session){ document.getElementById('custPhone').value = session.phone; }
+  checkoutModal.classList.add('show');
+  document.getElementById('cartDrawer').classList.remove('open'); overlay.classList.remove('show');
+});
+document.getElementById('closeCheckout').addEventListener('click',()=>checkoutModal.classList.remove('show'));
+document.getElementById('goPayment').addEventListener('click',()=>{
+  const name = document.getElementById('custName').value.trim();
+  const phone = document.getElementById('custPhone').value.trim();
+  const address = document.getElementById('custAddress').value.trim();
+  if(!name || !/^09\d{9}$/.test(phone) || !address){ alert('لطفاً همه فیلدها را به‌درستی پر کنید'); return; }
+  const products = getProducts(); const cart = getCart();
+  let total = 0; cart.forEach(i=>{ const p = products.find(x=>x.id===i.id); if(p) total += p.price*i.qty; });
+  document.getElementById('payAmount').textContent = fmtPrice(total);
+  document.getElementById('checkoutStep1').style.display='none';
+  document.getElementById('checkoutStep2').style.display='block';
+});
+document.getElementById('confirmPay').addEventListener('click',()=>{
+  const products = getProducts(); const cart = getCart();
+  let total = 0; const items = cart.map(i=>{ const p = products.find(x=>x.id===i.id); if(p) total += p.price*i.qty; return { id:i.id, name:p?p.name:'', qty:i.qty, price:p?p.price:0 }; });
+  const orderNum = 'IN-' + Date.now().toString().slice(-8);
+  const order = {
+    orderNum, date: new Date().toISOString(),
+    customer: { name: document.getElementById('custName').value.trim(), phone: document.getElementById('custPhone').value.trim(), address: document.getElementById('custAddress').value.trim() },
+    items, total, status: 'در انتظار بررسی'
+  };
+  const orders = getOrders(); orders.unshift(order); saveOrders(orders);
+  saveCart([]);
+  document.getElementById('orderNumBox').textContent = 'کد سفارش: ' + orderNum;
+  document.getElementById('checkoutStep2').style.display='none';
+  document.getElementById('checkoutStep3').style.display='block';
+});
+document.getElementById('closeOrderDone').addEventListener('click',()=>checkoutModal.classList.remove('show'));
+
+renderLogo(); renderSlider(); renderBrands(); renderProducts(); updateBadges();
+setTimeout(()=>{ const l=document.getElementById('loader'); if(l) l.classList.add('hide'); }, 600);
+</script>
+</body>
+</html>
